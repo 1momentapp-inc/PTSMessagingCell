@@ -7,13 +7,15 @@
  it under the terms of the Createive Commons (CC BY-SA 3.0) license
 */
 
+#import <UIKit/UIKit.h>
+
 #import "PTSMessagingCell.h"
 
 @implementation PTSMessagingCell
 
-static CGFloat textMarginHorizontal = 15.0f;
-static CGFloat textMarginVertical = 7.5f;
-static CGFloat messageTextSize = 14.0;
+static CGFloat textMarginHorizontal = 45.0f;
+static CGFloat textMarginVertical = 7.0f;
+static CGFloat messageTextSize = 13.0;
 
 @synthesize sent, messageLabel, messageView, timeLabel, avatarImageView, balloonView;
 
@@ -37,7 +39,10 @@ static CGFloat messageTextSize = 14.0;
 }
 
 +(CGSize)messageSize:(NSString*)message {
-    return [message sizeWithFont:[UIFont systemFontOfSize:messageTextSize] constrainedToSize:CGSizeMake([PTSMessagingCell maxTextWidth], CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping];
+    return [message boundingRectWithSize: CGSizeMake([PTSMessagingCell maxTextWidth], CGFLOAT_MAX)
+                                 options: 0
+                              attributes: @{NSFontAttributeName:[UIFont fontWithName:@"Avenir-Medium" size:12]}
+                                 context: nil].size;
 }
 
 +(UIImage*)balloonImage:(BOOL)sent isSelected:(BOOL)selected {
@@ -68,17 +73,17 @@ static CGFloat messageTextSize = 14.0;
         
         messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        avatarImageView = [[UIImageView alloc] initWithImage:nil];
+        avatarImageView = [[PFImageView alloc] initWithImage:nil];
        
         /*Message-Label*/
         self.messageLabel.backgroundColor = [UIColor clearColor];
-        self.messageLabel.font = [UIFont systemFontOfSize:messageTextSize];
+        self.messageLabel.font = [UIFont fontWithName:@"Avenir-Medium" size:messageTextSize];
         self.messageLabel.lineBreakMode = NSLineBreakByWordWrapping;
         self.messageLabel.numberOfLines = 0;
         
         /*Time-Label*/
-        self.timeLabel.font = [UIFont boldSystemFontOfSize:12.0f];
-        self.timeLabel.textColor = [UIColor darkGrayColor];
+        self.timeLabel.font = [UIFont fontWithName:@"Avenir-Medium" size:8.0];
+        self.timeLabel.textColor = [UIColor grayColor];
         self.timeLabel.backgroundColor = [UIColor clearColor];
         
         /*...and adds them to the view.*/
@@ -109,50 +114,35 @@ static CGFloat messageTextSize = 14.0;
     CGSize textSize = [PTSMessagingCell messageSize:self.messageLabel.text];
     
     /*Calculates the size of the timestamp.*/
-    CGSize dateSize = [self.timeLabel.text sizeWithFont:self.timeLabel.font forWidth:[PTSMessagingCell maxTextWidth] lineBreakMode:NSLineBreakByClipping];
+    CGSize dateSize = [self.timeLabel.text boundingRectWithSize: CGSizeMake([PTSMessagingCell maxTextWidth], CGFLOAT_MAX)
+                                                        options: NSStringDrawingTruncatesLastVisibleLine
+                                                     attributes: @{NSFontAttributeName:self.timeLabel.font}
+                                                        context: nil].size;
+//    [self.timeLabel.text sizeWithFont: self.timeLabel.font forWidth:[PTSMessagingCell maxTextWidth] lineBreakMode:NSLineBreakByClipping];
     
-    /*Initializes the different frames , that need to be calculated.*/
-    CGRect ballonViewFrame = CGRectZero;
-    CGRect messageLabelFrame = CGRectZero;
-    CGRect timeLabelFrame = CGRectZero;
-    CGRect avatarImageFrame = CGRectZero;
-       
     if (self.sent == YES) {
-        timeLabelFrame = CGRectMake(self.frame.size.width - dateSize.width - textMarginHorizontal, 0.0f, dateSize.width, dateSize.height);
+        self.balloonView.frame = CGRectMake(self.frame.size.width - (textSize.width + 2*textMarginHorizontal)+20, self.timeLabel.frame.size.height, textSize.width+20 , textSize.height + 2*textMarginVertical);
         
-        ballonViewFrame = CGRectMake(self.frame.size.width - (textSize.width + 2*textMarginHorizontal), timeLabelFrame.size.height, textSize.width + 2*textMarginHorizontal, textSize.height + 2*textMarginVertical);
-        
-        messageLabelFrame = CGRectMake(self.frame.size.width - (textSize.width + textMarginHorizontal),  ballonViewFrame.origin.y + textMarginVertical, textSize.width, textSize.height);
-        
-        avatarImageFrame = CGRectMake(5.0f, timeLabelFrame.size.height, 50.0f, 50.0f);
+        self.messageLabel.frame = CGRectMake(self.frame.size.width - (textSize.width + textMarginHorizontal)-20,  self.balloonView.frame.origin.y + textMarginVertical, textSize.width, textSize.height);
 
-    } else {
-        timeLabelFrame = CGRectMake(textMarginHorizontal, 0.0f, dateSize.width, dateSize.height);
-        
-        ballonViewFrame = CGRectMake(0.0f, timeLabelFrame.size.height, textSize.width + 2*textMarginHorizontal, textSize.height + 2*textMarginVertical);
-        
-        messageLabelFrame = CGRectMake(textMarginHorizontal, ballonViewFrame.origin.y + textMarginVertical, textSize.width, textSize.height);
-        
-        
-        avatarImageFrame = CGRectMake(self.frame.size.width - 55.0f, timeLabelFrame.size.height, 50.0f, 50.0f);
+        self.avatarImageView.frame = CGRectMake(self.frame.size.width-40, textSize.height + 2*textMarginVertical-18, 30, 30);
+    self.timeLabel.frame = CGRectMake(self.frame.size.width - dateSize.width - textMarginHorizontal-4, self.avatarImageView.frame.origin.y+30, dateSize.width, dateSize.height);
     }
+    else {
+        self.timeLabel.frame = CGRectMake(textMarginHorizontal-5, self.frame.size.height-5, dateSize.width, dateSize.height);
+        
+        self.balloonView.frame = CGRectMake(40.0f, self.timeLabel.frame.size.height, textSize.width + 20, textSize.height + 2*textMarginVertical);
+        
+        self.messageLabel.frame = CGRectMake(textMarginHorizontal+10, self.balloonView.frame.origin.y + textMarginVertical, textSize.width, textSize.height);
+        
+        self.avatarImageView.frame = CGRectMake(5, textSize.height + 2*textMarginVertical-18, 30, 30);
+        
+        
+    }
+    self.avatarImageView.layer.cornerRadius = 15;
+    self.avatarImageView.clipsToBounds = YES;
     
     self.balloonView.image = [PTSMessagingCell balloonImage:self.sent isSelected:self.selected];
-    
-    /*Sets the pre-initialized frames  for the balloonView and messageView.*/
-    self.balloonView.frame = ballonViewFrame;
-    self.messageLabel.frame = messageLabelFrame;
-    
-    /*If shown (and loaded), sets the frame for the avatarImageView*/
-    if (self.avatarImageView.image != nil) {
-        self.avatarImageView.frame = avatarImageFrame;
-    }
-    
-    /*If there is next for the timeLabel, sets the frame of the timeLabel.*/
-    
-    if (self.timeLabel.text != nil) {
-        self.timeLabel.frame = timeLabelFrame;
-    }
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

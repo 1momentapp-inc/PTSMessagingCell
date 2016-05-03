@@ -8,6 +8,7 @@ it under the terms of the Createive Commons (CC BY-SA 3.0) license
 */
 
 #import <UIKit/UIKit.h>
+#import <ParseUI/ParseUI.h>
 
 /** \class PTSMessagingCell
     \brief This class extends a UITableViewCell with a style similar to that of the SMS-App (iOS). It displays a text-message of any size (only limited by the capabilities of UIView), a timestamp (if given) and an avatar-Image (if given). 
@@ -24,7 +25,7 @@ it under the terms of the Createive Commons (CC BY-SA 3.0) license
 
 @interface PTSMessagingCell : UITableViewCell {
     /*Subview of the MessaginCell, containing the Avatar-Image (if specified). It can be set in the cellForRowAtIndexPath:-Method.*/
-    UIImageView* avatarImageView;
+    PFImageView* avatarImageView;
     
     /*Subview of the MessaginCell, containing the timestamp (if specified). It can be set in the cellForRowAtIndexPath:-Method.*/
     UILabel* timeLabel;
@@ -49,9 +50,9 @@ it under the terms of the Createive Commons (CC BY-SA 3.0) license
 
 @property (nonatomic, readonly) UILabel * timeLabel;
 
-@property (nonatomic, readonly) UIImageView * avatarImageView;
+@property (nonatomic, readonly) PFImageView * avatarImageView;
 
-@property (nonatomic, readonly) UIImageView * balloonView;
+@property (nonatomic) UIImageView * balloonView;
 
 @property (assign) BOOL sent;
 
