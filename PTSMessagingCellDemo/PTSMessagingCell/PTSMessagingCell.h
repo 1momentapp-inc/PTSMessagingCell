@@ -8,7 +8,8 @@ it under the terms of the Createive Commons (CC BY-SA 3.0) license
 */
 
 #import <UIKit/UIKit.h>
-#import <ParseUI/ParseUI.h>
+
+@class PFImageView;
 
 /** \class PTSMessagingCell
     \brief This class extends a UITableViewCell with a style similar to that of the SMS-App (iOS). It displays a text-message of any size (only limited by the capabilities of UIView), a timestamp (if given) and an avatar-Image (if given). 
